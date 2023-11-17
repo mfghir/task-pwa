@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
 
 function App() {
   const [hasPhoto, setHasPhoto] = useState(false);
+  const [openCamera, setOpenCamera] = useState(false);
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
@@ -33,6 +32,7 @@ function App() {
     let ctx = photo.getContext("2d");
     ctx.drawImage(video, 0, 0, width, height);
     setHasPhoto(true);
+    setOpenCamera(false)
   };
 
   const closeHandler = () => {
@@ -47,21 +47,36 @@ function App() {
   }, [videoRef]);
 
   return (
-    <div className="App">
-      <div className="camera">
-        <video ref={videoRef}></video>
-        <button className="btn" onClick={takePhoto}>
-          open camera
-        </button>
-      </div>
+    <main className="App">
+      <section className="main">
+        <div className="camera-box">
+          <div className={`camera ${openCamera ? "showOn" : "showOff"}`}>
+            <video ref={videoRef}></video>
+            <button className="btn" onClick={takePhoto}>
+              take pic
+            </button>
+          </div>
 
-      <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
-        <canvas ref={photoRef}></canvas>
-        <button className="btn" onClick={closeHandler}>
-          close
-        </button>
-      </div>
-    </div>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
+            incidunt repudiandae porro ullam, quis inventore, culpa suscipit
+            quibusdam laudantium sequi qui tempora quam assumenda ipsa.
+          </p>
+          <img src="../public/img/car.png" alt="car" />
+          {/* <button className="btn" onClick={takePhoto}> */}
+          <button className="btn" onClick={() => setOpenCamera(!openCamera)}>
+            open camera
+          </button>
+        </div>
+
+        <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
+          <canvas ref={photoRef}></canvas>
+          <button className="btn" onClick={closeHandler}>
+            close
+          </button>
+        </div>
+      </section>
+    </main>
   );
 }
 
