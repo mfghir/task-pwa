@@ -3,6 +3,12 @@ import { useEffect, useRef, useState } from "react";
 function App() {
   const [hasPhoto, setHasPhoto] = useState(false);
   const [openCamera, setOpenCamera] = useState(false);
+
+  // const [cameraTimeout, setCameraTimeout] = useState(null);
+  const [timer, setTimer] = useState(30);
+  const [videoClosed, setVideoClosed] = useState(false);
+  const timerRef = useRef(null);
+
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
@@ -32,30 +38,68 @@ function App() {
     let ctx = photo.getContext("2d");
     ctx.drawImage(video, 0, 0, width, height);
     setHasPhoto(true);
-    setOpenCamera(false)
+    setOpenCamera(false);
+
+    clearInterval(timerRef.current);
   };
 
   const closeHandler = () => {
-    let photo = photoRef.current;
-    let ctx = photo.getContext("2d");
-    ctx.clearRect(0, 0, photo.width, photo.height);
+    // let photo = photoRef.current;
+    // let ctx = photo.getContext("2d");
+    // ctx.clearRect(0, 0, photo.width, photo.height);
     setHasPhoto(false);
+
+    setOpenCamera(false);
+    clearInterval(timerRef.current);
   };
+
+
+
+
 
   useEffect(() => {
     getVideo();
+    return () => {
+      clearInterval(timerRef.current);
+    };
   }, [videoRef]);
+
+  useEffect(() => {
+    if (openCamera && !videoClosed) {
+      timerRef.current = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+      setTimer(30);
+    }
+  }, [openCamera,videoClosed]);
+
+  useEffect(() => {
+    if (timer === 0) {
+      takePhoto();
+      setVideoClosed(true);
+    }
+  }, [timer]);
 
   return (
     <main className="App">
       <section className="main">
         <div className="camera-box">
-          <div className={`camera ${openCamera ? "showOn" : "showOff"}`}>
-            <video ref={videoRef}></video>
-            <button className="btn" onClick={takePhoto}>
-              take pic
-            </button>
-          </div>
+          {openCamera && !videoClosed &&(
+            <div
+              // ${cameraTimeout ? "showOn" : "showOff"}
+              className={`camera 
+              ${openCamera ? "showOn" : "showOff"}
+            `}
+            >
+              <video ref={videoRef}></video>
+              {openCamera && <p>{timer}s</p>}
+              <button className="btn" onClick={takePhoto}>
+                take pic
+              </button>
+            </div>
+          )}
 
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
@@ -64,17 +108,17 @@ function App() {
           </p>
           <img src="../public/img/car.png" alt="car" />
           {/* <button className="btn" onClick={takePhoto}> */}
-          <button className="btn" onClick={() => setOpenCamera(!openCamera)}>
+          <button className="btn" onClick={() => setOpenCamera(!openCamera|| videoClosed)}>
             open camera
           </button>
         </div>
 
-        <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
+        { !videoClosed && <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
           <canvas ref={photoRef}></canvas>
           <button className="btn" onClick={closeHandler}>
             close
           </button>
-        </div>
+        </div>}
       </section>
     </main>
   );
