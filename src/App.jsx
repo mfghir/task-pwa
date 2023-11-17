@@ -4,7 +4,6 @@ function App() {
   const [hasPhoto, setHasPhoto] = useState(false);
   const [openCamera, setOpenCamera] = useState(false);
 
-  // const [cameraTimeout, setCameraTimeout] = useState(null);
   const [timer, setTimer] = useState(30);
   const [videoClosed, setVideoClosed] = useState(false);
   const timerRef = useRef(null);
@@ -12,8 +11,8 @@ function App() {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
-  const getVideo = () => {
-    navigator.mediaDevices
+  const getVideo =async () => {
+    await   navigator.mediaDevices
       .getUserMedia({
         video: { width: 430, height: 600 },
       })
@@ -43,6 +42,16 @@ function App() {
     clearInterval(timerRef.current);
   };
 
+
+  const getLocation = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log("Latitude:", position.coords.latitude);
+      console.log("Longitude:", position.coords.longitude);
+    }, (error) => {
+      console.log("Error getting location:", error);
+    });
+  };
+
   const closeHandler = () => {
     // let photo = photoRef.current;
     // let ctx = photo.getContext("2d");
@@ -53,16 +62,40 @@ function App() {
     clearInterval(timerRef.current);
   };
 
+  const openCameraWithTimer = () => {
+
+    // setOpenCamera(!openCamera)
+// timerRef.current = setInterval(() => {
+      navigator.permissions.query({ name: 'camera' })
+        .then((cameraPermission) => {
+          if (cameraPermission.state === "granted") {
+            getLocation();
+            openCameraWithTimer();
+          } else if (cameraPermission.state === "prompt") {
+            navigator.mediaDevices.getUserMedia({ video: true })
+              .then(() => {
+                getLocation();
+                openCameraWithTimer();
+              })
+              .catch((error) => {
+                console.log("Error accessing camera:", error);
+              });
+          } else {
+            console.log("Camera permission denied");
+          }
+        })
+        .catch((error) => {
+          console.log("Error querying camera permission:", error);
+        });
+    // })
+    
+    setVideoClosed(false); // Reset the videoClosed flag to false when opening the camera again
+    setOpenCamera(true);
+  
+  };
 
 
 
-
-  useEffect(() => {
-    getVideo();
-    return () => {
-      clearInterval(timerRef.current);
-    };
-  }, [videoRef]);
 
   useEffect(() => {
     if (openCamera && !videoClosed) {
@@ -77,7 +110,7 @@ function App() {
 
   useEffect(() => {
     if (timer === 0) {
-      takePhoto();
+      closeHandler();
       setVideoClosed(true);
     }
   }, [timer]);
@@ -86,11 +119,11 @@ function App() {
     <main className="App">
       <section className="main">
         <div className="camera-box">
-          {openCamera && !videoClosed &&(
+          {openCamera  && !videoClosed  &&(
             <div
+            // ${openCamera ? "showOn" : "showOff"}
               // ${cameraTimeout ? "showOn" : "showOff"}
-              className={`camera 
-              ${openCamera ? "showOn" : "showOff"}
+              className={`camera showOn
             `}
             >
               <video ref={videoRef}></video>
@@ -108,7 +141,8 @@ function App() {
           </p>
           <img src="../public/img/car.png" alt="car" />
           {/* <button className="btn" onClick={takePhoto}> */}
-          <button className="btn" onClick={() => setOpenCamera(!openCamera|| videoClosed)}>
+          {/* <button className="btn" onClick={() => setOpenCamera(!openCamera)}> */}
+          <button className="btn" onClick={openCameraWithTimer}>
             open camera
           </button>
         </div>
