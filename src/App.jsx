@@ -35,7 +35,7 @@ function App() {
     navigator.mediaDevices
       .getUserMedia({
         video: {
-          facingMode: { exact: "environment" },
+          // facingMode: { exact: "environment" },
           width: { ideal: 430 },
           height: { ideal: 900 },
         },
@@ -92,18 +92,15 @@ function App() {
     navigator.permissions
       .query({ name: "geolocation" })
       .then((locationPermission) => {
-        console.log(locationPermission);
         if (locationPermission.state === "granted") {
           getLocation();
-          // openCameraWithTimer();
-          requestCamera();
+          getVideo();
         } else if (locationPermission.state === "prompt") {
           navigator.mediaDevices
             .getUserMedia({ video: true })
             .then(() => {
               getLocation();
-              requestCamera();
-              // openCameraWithTimer();
+              getVideo();
             })
             .catch((error) => {
               console.log("Error accessing camera:", error);
