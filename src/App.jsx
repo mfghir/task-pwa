@@ -71,20 +71,26 @@ function App() {
  const openCameraWithTimer = async () => {
   setOpenCamera(true);
 
-  const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+  try {
+    const cameraPermission = await navigator.permissions.query({ name: 'camera' });
 
-  if (cameraPermission.state === 'granted') {
-    getVideo();
-  } else if (cameraPermission.state === 'prompt') {
-    try {
+    if (cameraPermission.state === 'granted') {
+      getVideo();
+    } else if (cameraPermission.state === 'prompt') {
       await navigator.mediaDevices.getUserMedia({ video: true });
       getVideo();
-    } catch (error) {
-      console.log('Error accessing camera:', error);
-      setOpenCamera(false);
+    } else {
+      const newPermission = await navigator.permissions.request({ name: 'camera' });
+
+      if (newPermission.state === 'granted') {
+        getVideo();
+      } else {
+        console.log('Camera permission denied');
+        setOpenCamera(false);
+      }
     }
-  } else {
-    console.log('Camera permission denied');
+  } catch (error) {
+    console.log('Error accessing camera:', error);
     setOpenCamera(false);
   }
 };
