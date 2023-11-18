@@ -19,16 +19,18 @@ const getVideo = () => {
       height: { ideal: 600 }
     }
   };
-
-  navigator.mediaDevices.getUserMedia(videoConstraints)
-    .then((stream) => {
-      let video = videoRef.current;
-      video.srcObject = stream;
-      video.play();
-    })
-    .catch((error) => {
-      console.log('Error accessing camera:', error);
-    });
+  let video = videoRef.current;
+  video.srcObject = stream;
+  video.play();
+  // navigator.mediaDevices.getUserMedia(videoConstraints)
+  //   .then((stream) => {
+  //     let video = videoRef.current;
+  //     video.srcObject = stream;
+  //     video.play();
+  //   })
+  //   .catch((error) => {
+  //     console.log('Error accessing camera:', error);
+  //   });
 };
 
   const takePhoto = () => {
@@ -158,6 +160,7 @@ const requestCamera = () => {
           {/* )} */}
 
           <p>
+          aaaa
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
             incidunt repudiandae porro ullam, quis inventore, culpa suscipit
             quibusdam laudantium sequi qui tempora quam assumenda ipsa.
