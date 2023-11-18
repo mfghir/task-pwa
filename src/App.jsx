@@ -35,7 +35,7 @@ function App() {
     navigator.mediaDevices
       .getUserMedia({
         video: {
-          // facingMode: { exact: "environment" },
+          facingMode: { exact: "environment" },
           width: { ideal: 430 },
           height: { ideal: 900 },
         },
