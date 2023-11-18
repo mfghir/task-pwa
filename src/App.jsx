@@ -11,24 +11,10 @@ function App() {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
-  const getVideo = () => {
-    const videoConstraints = {
-      video: {
-        facingMode: { exact: 'environment' },
-        width: { ideal: 430 },
-        height: { ideal: 600 }
-      }
-    };
-  
-    navigator.mediaDevices.getUserMedia(videoConstraints)
-      .then((stream) => {
-        let video = videoRef.current;
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch((error) => {
-        console.log('Error accessing camera:', error);
-      });
+  const getVideo = (stream) => {
+    let video = videoRef.current;
+    video.srcObject = stream;
+    video.play();
   };
 
   const takePhoto = () => {
@@ -68,46 +54,41 @@ function App() {
     clearInterval(timerRef.current);
   };
 
-  const openCameraWithTimer = () => {
-    setOpenCamera(!openCamera);
+ const openCameraWithTimer = () => {
+  setOpenCamera(true);
 
-    //  timerRef.current = setInterval(() => {
-    navigator.permissions
-      .query({ name: "geolocation" })
-      .then((locationPermission) => {
-        console.log(locationPermission);
-        
-        if (locationPermission.state === "granted") {
-          getLocation();
-          // openCameraWithTimer();
-          requestCamera();
-        } else if (locationPermission.state === "prompt") {
-          navigator.mediaDevices
-            .getUserMedia({ video: true })
-            .then(() => {
+  navigator.permissions
+    .query({ name: 'geolocation' })
+    .then((locationPermission) => {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((cameraStream) => {
+          if (locationPermission.state === 'granted') {
+            getLocation();
+            getVideo(cameraStream);
+          } else if (locationPermission.state === 'prompt') {
+            navigator.geolocation.getCurrentPosition(() => {
               getLocation();
-              requestCamera();
-              // openCameraWithTimer();
-            })
-            .catch((error) => {
-              console.log("Error accessing camera:", error);
-              setOpenCamera(false);
+              getVideo(cameraStream);
             });
-        } else {
-          console.log("Camera permission denied");
+          } else {
+            console.log('Permission denied');
+            setOpenCamera(false);
+          }
+        })
+        .catch((error) => {
+          console.log('Error accessing camera:', error);
           setOpenCamera(false);
-        }
-      })
-      .catch((error) => {
-        console.log("Error querying camera permission:", error);
-      });
-    // });
+        });
+    })
+    .catch((error) => {
+      console.log('Error querying permissions:', error);
+      setOpenCamera(false);
+    });
 
-    setVideoClosed(false); 
-    setOpenCamera(true);
-  };
-
-
+  setVideoClosed(false);
+  setHasPhoto(false);
+};
   
 const requestCamera = () => {
   navigator.mediaDevices.getUserMedia({ video: true })
