@@ -37,7 +37,7 @@ function App() {
         video: {
           facingMode: { exact: "environment" },
           width: { ideal: 430 },
-          height: { ideal: 900 },
+          height: { ideal: 600 },
         },
       })
       .then((stream) => {
