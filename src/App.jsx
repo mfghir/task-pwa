@@ -12,16 +12,29 @@ function App() {
   const photoRef = useRef(null);
 
   const getVideo = () => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: { width: 430, height: 930 },
+    navigator.mediaDevices.enumerateDevices()
+      .then((devices) => {
+        const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+        const backCamera = videoDevices.find((device) => device.label.toLowerCase().includes('back'));
+  
+        const constraints = {
+          video: {
+            deviceId: backCamera ? { exact: backCamera.deviceId } : undefined,
+            width: { ideal: 430 },
+            height: { ideal: 600 }
+          }
+        };
+  
+        return navigator.mediaDevices.getUserMedia(constraints);
       })
       .then((stream) => {
         let video = videoRef.current;
         video.srcObject = stream;
         video.play();
       })
-      .then((err) => console.log("err", err));
+      .catch((error) => {
+        console.log('Error accessing camera:', error);
+      });
   };
 
   const takePhoto = () => {
