@@ -11,8 +11,8 @@ function App() {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
-  const getVideo =async () => {
-    await   navigator.mediaDevices
+  const getVideo = () => {
+    navigator.mediaDevices
       .getUserMedia({
         video: { width: 430, height: 600 },
       })
@@ -27,6 +27,7 @@ function App() {
   const takePhoto = () => {
     const width = 414;
     const height = width / (16 / 9);
+    // const height = window.innerHeight;
 
     let video = videoRef.current;
     let photo = photoRef.current;
@@ -42,20 +43,18 @@ function App() {
     clearInterval(timerRef.current);
   };
 
-
   const getLocation = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      console.log("Latitude:", position.coords.latitude);
-      console.log("Longitude:", position.coords.longitude);
-    }, (error) => {
-      console.log("Error getting location:", error);
-    });
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        console.log("Latitude:", position.coords.latitude);
+        console.log("Longitude:", position.coords.longitude);
+      });
+    } else {
+      console.log("Geo Location not supported by browser");
+    }
   };
 
   const closeHandler = () => {
-    // let photo = photoRef.current;
-    // let ctx = photo.getContext("2d");
-    // ctx.clearRect(0, 0, photo.width, photo.height);
     setHasPhoto(false);
 
     setOpenCamera(false);
@@ -63,38 +62,55 @@ function App() {
   };
 
   const openCameraWithTimer = () => {
+    setOpenCamera(!openCamera);
 
-    // setOpenCamera(!openCamera)
-// timerRef.current = setInterval(() => {
-      navigator.permissions.query({ name: 'camera' })
-        .then((cameraPermission) => {
-          if (cameraPermission.state === "granted") {
-            getLocation();
-            openCameraWithTimer();
-          } else if (cameraPermission.state === "prompt") {
-            navigator.mediaDevices.getUserMedia({ video: true })
-              .then(() => {
-                getLocation();
-                openCameraWithTimer();
-              })
-              .catch((error) => {
-                console.log("Error accessing camera:", error);
-              });
-          } else {
-            console.log("Camera permission denied");
-          }
-        })
-        .catch((error) => {
-          console.log("Error querying camera permission:", error);
-        });
-    // })
-    
-    setVideoClosed(false); // Reset the videoClosed flag to false when opening the camera again
+    //  timerRef.current = setInterval(() => {
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((locationPermission) => {
+        console.log(locationPermission);
+        if (locationPermission.state === "granted") {
+          getLocation();
+          // openCameraWithTimer();
+          requestCamera();
+        } else if (locationPermission.state === "prompt") {
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(() => {
+              getLocation();
+              requestCamera();
+              // openCameraWithTimer();
+            })
+            .catch((error) => {
+              console.log("Error accessing camera:", error);
+              setOpenCamera(false);
+            });
+        } else {
+          console.log("Camera permission denied");
+          setOpenCamera(false);
+        }
+      })
+      .catch((error) => {
+        console.log("Error querying camera permission:", error);
+      });
+    // });
+
+    setVideoClosed(false); 
     setOpenCamera(true);
-  
   };
 
 
+  
+const requestCamera = () => {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(() => {
+      getVideo();
+    })
+    .catch((error) => {
+      console.log('Error accessing camera:', error);
+      setOpenCamera(false);
+    });
+};
 
 
   useEffect(() => {
@@ -106,7 +122,7 @@ function App() {
       clearInterval(timerRef.current);
       setTimer(30);
     }
-  }, [openCamera,videoClosed]);
+  }, [openCamera, videoClosed]);
 
   useEffect(() => {
     if (timer === 0) {
@@ -119,20 +135,20 @@ function App() {
     <main className="App">
       <section className="main">
         <div className="camera-box">
-          {openCamera  && !videoClosed  &&(
-            <div
-            // ${openCamera ? "showOn" : "showOff"}
-              // ${cameraTimeout ? "showOn" : "showOff"}
-              className={`camera showOn
+          {/* {openCamera && ( */}
+          <div
+            // ${cameraTimeout ? "showOn" : "showOff"}
+            className={`camera 
+              ${openCamera ? "showOn" : "showOff"}
             `}
-            >
-              <video ref={videoRef}></video>
-              {openCamera && <p>{timer}s</p>}
-              <button className="btn" onClick={takePhoto}>
-                take pic
-              </button>
-            </div>
-          )}
+          >
+            <video ref={videoRef}></video>
+            {openCamera && <p>{timer}s</p>}
+            <button className="btn" onClick={takePhoto}>
+              take pic
+            </button>
+          </div>
+          {/* )} */}
 
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
@@ -147,12 +163,14 @@ function App() {
           </button>
         </div>
 
-        { !videoClosed && <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
-          <canvas ref={photoRef}></canvas>
-          <button className="btn" onClick={closeHandler}>
-            close
-          </button>
-        </div>}
+        {!videoClosed && (
+          <div className={"result " + (hasPhoto ? "hasPhoto" : "")}>
+            <canvas ref={photoRef}></canvas>
+            <button className="btn" onClick={closeHandler}>
+              close
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );
