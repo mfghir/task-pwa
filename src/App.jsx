@@ -154,9 +154,7 @@ function App() {
     <main className="App">
       <section className="main">
         <div className="camera-box">
-          {/* {openCamera && ( */}
           <div
-            // ${cameraTimeout ? "showOn" : "showOff"}
             className={`camera 
               ${openCamera ? "showOn" : "showOff"}
             `}
@@ -167,7 +165,6 @@ function App() {
               take pic
             </button>
           </div>
-          {/* )} */}
 
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
@@ -175,8 +172,6 @@ function App() {
             quibusdam laudantium sequi qui tempora quam assumenda ipsa.
           </p>
           <img src="../public/img/car.png" alt="car" />
-          {/* <button className="btn" onClick={takePhoto}> */}
-          {/* <button className="btn" onClick={() => setOpenCamera(!openCamera)}> */}
           <button className="btn" onClick={openCameraWithTimer}>
             open camera
           </button>
