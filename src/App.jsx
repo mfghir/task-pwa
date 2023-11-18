@@ -68,32 +68,44 @@ function App() {
     clearInterval(timerRef.current);
   };
 
- const openCameraWithTimer = async () => {
-  setOpenCamera(true);
+  const openCameraWithTimer = () => {
+    setOpenCamera(!openCamera);
 
-  try {
-    const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+    //  timerRef.current = setInterval(() => {
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((locationPermission) => {
+        console.log(locationPermission);
+        
+        if (locationPermission.state === "granted") {
+          getLocation();
+          // openCameraWithTimer();
+          requestCamera();
+        } else if (locationPermission.state === "prompt") {
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(() => {
+              getLocation();
+              requestCamera();
+              // openCameraWithTimer();
+            })
+            .catch((error) => {
+              console.log("Error accessing camera:", error);
+              setOpenCamera(false);
+            });
+        } else {
+          console.log("Camera permission denied");
+          setOpenCamera(false);
+        }
+      })
+      .catch((error) => {
+        console.log("Error querying camera permission:", error);
+      });
+    // });
 
-    if (cameraPermission.state === 'granted') {
-      getVideo();
-    } else if (cameraPermission.state === 'prompt') {
-      await navigator.mediaDevices.getUserMedia({ video: true });
-      getVideo();
-    } else {
-      const newPermission = await navigator.permissions.request({ name: 'camera' });
-
-      if (newPermission.state === 'granted') {
-        getVideo();
-      } else {
-        console.log('Camera permission denied');
-        setOpenCamera(false);
-      }
-    }
-  } catch (error) {
-    console.log('Error accessing camera:', error);
-    setOpenCamera(false);
-  }
-};
+    setVideoClosed(false); 
+    setOpenCamera(true);
+  };
 
 
   
