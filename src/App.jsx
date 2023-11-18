@@ -36,8 +36,8 @@ function App() {
       .getUserMedia({
         video: {
           facingMode: { exact: "environment" },
-          width: 430,
-          height: 930,
+          width: { ideal: 430 },
+          height: { ideal: 900 },
         },
       })
       .then((stream) => {
@@ -50,8 +50,8 @@ function App() {
 
   const takePhoto = () => {
     const width = 414;
-    // const height = width / (16 / 9);
-    const height = window.innerHeight;
+    const height = width / (16 / 9);
+    // const height = window.innerHeight;
 
     let video = videoRef.current;
     let photo = photoRef.current;
