@@ -37,7 +37,7 @@ function App() {
         video: {
           facingMode: { exact: "environment" },
           width: { ideal: 430 },
-          height: { ideal: 600 },
+          height: { ideal: 900 },
         },
       })
       .then((stream) => {
@@ -50,7 +50,7 @@ function App() {
 
   const takePhoto = () => {
     const width = 414;
-    const height = width / (16 / 9);
+    const height = 600
     // const height = window.innerHeight;
 
     let video = videoRef.current;
@@ -88,7 +88,6 @@ function App() {
   const openCameraWithTimer = () => {
     setOpenCamera(!openCamera);
 
-    //  timerRef.current = setInterval(() => {
     navigator.permissions
       .query({ name: "geolocation" })
       .then((locationPermission) => {
@@ -114,23 +113,22 @@ function App() {
       .catch((error) => {
         console.log("Error querying camera permission:", error);
       });
-    // });
 
     setVideoClosed(false);
     setOpenCamera(true);
   };
 
-  const requestCamera = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then(() => {
-        getVideo();
-      })
-      .catch((error) => {
-        console.log("Error accessing camera:", error);
-        setOpenCamera(false);
-      });
-  };
+  // const requestCamera = () => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({ video: true })
+  //     .then(() => {
+  //       getVideo();
+  //     })
+  //     .catch((error) => {
+  //       console.log("Error accessing camera:", error);
+  //       setOpenCamera(false);
+  //     });
+  // };
 
   useEffect(() => {
     if (openCamera && !videoClosed) {
@@ -167,6 +165,7 @@ function App() {
           </div>
 
           <p>
+            aaa
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
             incidunt repudiandae porro ullam, quis inventore, culpa suscipit
             quibusdam laudantium sequi qui tempora quam assumenda ipsa.
