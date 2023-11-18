@@ -11,27 +11,42 @@ function App() {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
-const getVideo = () => {
-  const videoConstraints = {
-    video: {
-      facingMode: { exact: 'environment' },
-      width: { ideal: 430 },
-      height: { ideal: 600 }
-    }
+  // const getVideo = () => {
+  //   const videoConstraints = {
+  //     video: {
+  //       facingMode: { exact: 'environment' },
+  //       width: { ideal: 430 },
+  //       height: { ideal: 600 }
+  //     }
+  //   };
+
+  //   navigator.mediaDevices.getUserMedia(videoConstraints)
+  //     .then((stream) => {
+  //       let video = videoRef.current;
+  //       video.srcObject = stream;
+  //       video.play();
+  //     })
+  //     .catch((error) => {
+  //       console.log('Error accessing camera:', error);
+  //     });
+  // };
+
+  const getVideo = () => {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: {
+          facingMode: { exact: "environment" },
+          width: 430,
+          height: 930,
+        },
+      })
+      .then((stream) => {
+        let video = videoRef.current;
+        video.srcObject = stream;
+        video.play();
+      })
+      .then((err) => console.log("err", err));
   };
-  let video = videoRef.current;
-  video.srcObject = stream;
-  video.play();
-  // navigator.mediaDevices.getUserMedia(videoConstraints)
-  //   .then((stream) => {
-  //     let video = videoRef.current;
-  //     video.srcObject = stream;
-  //     video.play();
-  //   })
-  //   .catch((error) => {
-  //     console.log('Error accessing camera:', error);
-  //   });
-};
 
   const takePhoto = () => {
     const width = 414;
@@ -104,23 +119,21 @@ const getVideo = () => {
       });
     // });
 
-    setVideoClosed(false); 
+    setVideoClosed(false);
     setOpenCamera(true);
   };
 
-
-  
-const requestCamera = () => {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(() => {
-      getVideo();
-    })
-    .catch((error) => {
-      console.log('Error accessing camera:', error);
-      setOpenCamera(false);
-    });
-};
-
+  const requestCamera = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(() => {
+        getVideo();
+      })
+      .catch((error) => {
+        console.log("Error accessing camera:", error);
+        setOpenCamera(false);
+      });
+  };
 
   useEffect(() => {
     if (openCamera && !videoClosed) {
@@ -160,7 +173,6 @@ const requestCamera = () => {
           {/* )} */}
 
           <p>
-          aaaa
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
             incidunt repudiandae porro ullam, quis inventore, culpa suscipit
             quibusdam laudantium sequi qui tempora quam assumenda ipsa.
