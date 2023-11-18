@@ -12,21 +12,15 @@ function App() {
   const photoRef = useRef(null);
 
   const getVideo = () => {
-    navigator.mediaDevices.enumerateDevices()
-      .then((devices) => {
-        const videoDevices = devices.filter((device) => device.kind === 'videoinput');
-        const backCamera = videoDevices.find((device) => device.label.toLowerCase().includes('back'));
+    const videoConstraints = {
+      video: {
+        facingMode: { exact: 'environment' },
+        width: { ideal: 430 },
+        height: { ideal: 600 }
+      }
+    };
   
-        const constraints = {
-          video: {
-            deviceId: backCamera ? { exact: backCamera.deviceId } : undefined,
-            width: { ideal: 430 },
-            height: { ideal: 600 }
-          }
-        };
-  
-        return navigator.mediaDevices.getUserMedia(constraints);
-      })
+    navigator.mediaDevices.getUserMedia(videoConstraints)
       .then((stream) => {
         let video = videoRef.current;
         video.srcObject = stream;
